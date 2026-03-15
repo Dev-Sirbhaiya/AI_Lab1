@@ -93,7 +93,7 @@ Find the shortest path from node **1** to node **50** across a 264,346-node NYC 
 | Total Energy Cost | 294,853 |
 | Nodes in Path | 122 |
 | Nodes Expanded | 5,304 |
-| Time | 0.024s |
+| Time | 0.052s |
 
 **Path:**
 ```
