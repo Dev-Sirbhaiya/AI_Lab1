@@ -116,24 +116,13 @@ Find the shortest path from node **1** to node **50** across a 264,346-node NYC 
 
 | Metric | Value |
 |--------|-------|
-| Shortest Distance | 165,976.54 |
-| Total Energy Cost | 273,434 |
-| Nodes in Path | 114 |
-| Nodes Expanded | 6,784 |
-| Time | 0.082s |
+| Shortest Distance | 150,784.61 |
+| Total Energy Cost | 287,931 |
+| Nodes in Path | 123 |
+| Nodes Expanded | 5,099 |
+| Time | 0.014s |
 
-**Path:**
-```
-1->1363->1358->1357->1356->1276->1273->1277->1269->1267->1242->1241->1240->
-1235->1231->1230->943->953->955->957->958->959->960->962->1002->952->1000->
-998->994->995->996->987->988->986->979->980->969->977->989->990->991->2465->
-2466->2384->2382->2385->2379->2377->2375->2376->2378->2403->2402->2404->2405->
-2406->2398->2395->2397->2142->2143->2144->2139->2131->2130->2129->2087->2081->
-2073->2075->2164->2163->2162->2159->2157->2154->2156->2158->2160->71->70->69->
-60->1851->1847->1846->1824->1797->1787->1775->1761->5526->5514->5510->5507->
-5484->5482->5479->5481->5480->5470->5477->5461->5459->5396->5395->5293->5292->
-5282->5285->5284->5280->5268->50
-```
+**Path:** `1->1363->1358->1357->1356 -> ... -> 5282->5283->5284->5280->50`
 
 ---
 
@@ -141,26 +130,15 @@ Find the shortest path from node **1** to node **50** across a 264,346-node NYC 
 
 | Metric | Value |
 |--------|-------|
-| Shortest Distance | 156,382.94 |
-| Total Energy Cost | 262,337 |
-| Nodes in Path | 137 |
-| Nodes Expanded | 2,258 |
-| Time | 0.009s |
+| Shortest Distance | 150,784.61 |
+| Total Energy Cost | 287,931 |
+| Nodes in Path | 123 |
+| Nodes Expanded | 1,573 |
+| Time | 0.006s |
 
-**Path:**
-```
-1->1363->1358->1357->1359->1280->1287->1371->1373->1374->1382->1383->1381->
-1385->1387->1443->1442->1444->1445->1447->1448->1460->1461->1462->1463->1474->
-3137->3138->3139->3142->3141->2999->3021->3023->3025->3026->3007->3004->3006->
-2974->2963->2555->2961->3027->2553->2644->2643->2630->2628->2627->2625->2585->
-2583->2580->2561->2557->2448->2388->2386->2380->2445->2444->2405->2406->2398->
-2395->2397->2140->2142->2141->2125->2126->2082->2080->2071->1979->1975->1967->
-1966->1974->1973->1971->1970->1948->1937->1939->1935->1931->1934->1673->1675->
-1674->1837->1671->1828->1825->1817->1815->1634->1814->1813->1632->1631->1742->
-1741->1740->1739->1591->1689->1585->1584->1688->1579->1679->1677->104->5680->
-5418->5431->5425->5424->5422->5413->5412->5411->66->5392->5387->5388->5291->
-5278->5289->5290->5283->5284->5280->50
-```
+**Path:** `1->1363->1358->1357->1356 -> ... -> 5282->5283->5284->5280->50`
+
+> UCS and A\* find the **identical optimal path** — A\* simply reaches it by expanding 69.2% fewer nodes, demonstrating the efficiency gain from the Euclidean heuristic.
 
 ---
 
@@ -168,13 +146,13 @@ Find the shortest path from node **1** to node **50** across a 264,346-node NYC 
 
 | Algorithm | Distance | Energy | Nodes Expanded | Time |
 |-----------|----------|--------|----------------|------|
-| Dijkstra (Task 1) | 148,648.64 | 294,853 | 5,304 | 0.024s |
-| UCS (Task 2) | 165,976.54 | 273,434 | 6,784 | 0.082s |
-| A* (Task 3) | 156,382.94 | 262,337 | 2,258 | 0.009s |
+| Dijkstra (Task 1) | 148,648.64 | 294,853 | 5,304 | 0.052s |
+| UCS (Task 2) | 150,784.61 | 287,931 | 5,099 | 0.014s |
+| A* (Task 3) | 150,784.61 | 287,931 | 1,573 | 0.006s |
 
-**A\* vs UCS:** distance `+5.8%` | energy `+4.1%` | nodes expanded `-66.7%`
+**A\* vs UCS:** distance `0.0%` | energy `0.0%` | nodes expanded `-69.2%`
 
-> A\* expands significantly fewer nodes than UCS thanks to the Euclidean heuristic, while finding a shorter and more energy-efficient path within the budget.
+> A\* and UCS find the **same optimal path** within the energy budget. A\* is faster because the Euclidean heuristic guides it directly toward the goal, expanding 69% fewer nodes with no loss in solution quality.
 
 ---
 
@@ -191,7 +169,7 @@ Find the shortest path from node **1** to node **50** across a 264,346-node NYC 
 
 ### Task 1A — Value Iteration
 
-- Converged in **28 iterations** (delta_final = 5.75e-07) in **0.015s**
+- Converged in **28 iterations** (delta_final = 5.75e-07) in **0.005s**
 
 **Value Function:**
 ```
@@ -215,7 +193,7 @@ y=0 |  →  →  →  ↑  ↑
 
 ### Task 1B — Policy Iteration
 
-- Converged in **5 outer iterations**, 171 total inner sweeps, in **0.024s**
+- Converged in **5 outer iterations**, 171 total inner sweeps, in **0.011s**
 - Value function and policy **identical** to Value Iteration (22/22 states match)
 - Max |V_VI − V_PI| = 4.75e-07 (numerical precision only)
 
@@ -224,7 +202,7 @@ y=0 |  →  →  →  ↑  ↑
 ### Task 2 — First-Visit Monte Carlo Control
 
 - 10,000 episodes, ε = 0.1
-- Completed in **0.6s**
+- Completed in **0.4s**
 - Final avg reward (last 100 eps): **-0.010** | avg episode length: **11.0 steps**
 - Converged (avg reward ≥ -5) at episode **153**
 - Policy agreement with VI: **14/22 states (64%)**
@@ -243,7 +221,7 @@ y=0 |  ↑  ↑  ←  →  ←
 ### Task 3 — Tabular Q-Learning
 
 - 10,000 episodes, ε = 0.1, α = 0.1
-- Completed in **0.7s**
+- Completed in **0.4s**
 - Final avg reward (last 100 eps): **-0.090** | avg episode length: **11.1 steps**
 - Converged (avg reward ≥ -5) at episode **112**
 - Policy agreement with VI: **20/22 states (91%)**
@@ -263,10 +241,10 @@ y=0 |  ↑  →  →  ↑  ↑
 
 | Method | Type | Time | Agrees with VI | Convergence Episode |
 |--------|------|------|----------------|---------------------|
-| Value Iteration | Dynamic Programming | 0.015s | 22/22 (100%) | 28 iterations |
-| Policy Iteration | Dynamic Programming | 0.024s | 22/22 (100%) | 5 outer iters |
-| Monte Carlo | Model-Free RL | 0.6s | 14/22 (64%) | Episode 153 |
-| Q-Learning | Model-Free RL | 0.7s | 20/22 (91%) | Episode 112 |
+| Value Iteration | Dynamic Programming | 0.005s | 22/22 (100%) | 28 iterations |
+| Policy Iteration | Dynamic Programming | 0.011s | 22/22 (100%) | 5 outer iters |
+| Monte Carlo | Model-Free RL | 0.4s | 14/22 (64%) | Episode 153 |
+| Q-Learning | Model-Free RL | 0.4s | 20/22 (91%) | Episode 112 |
 
 **Q-Learning converges ~41 episodes faster than Monte Carlo** because it updates Q-values at every step (TD bootstrapping), while Monte Carlo must wait for the full episode return.
 
