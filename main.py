@@ -45,9 +45,7 @@ class Tee:
     def __init__(self, *files):
         self.files = files
     def write(self, s):
-        for f in self.files:
-            f.write(s)
-            f.flush()
+        for f in self.files: f.write(s)
     def flush(self):
         for f in self.files: f.flush()
 
@@ -79,7 +77,8 @@ def _reconstruct(parent):
     return path
 
 def fmt_path(path, show=5):
-    return "->".join(path)
+    if len(path) <= 2*show: return "->".join(path)
+    return "->".join(path[:show]) + " -> ... -> " + "->".join(path[-show:])
 
 
 # ── Task 1 : Dijkstra ────────────────────────────────────────
@@ -107,14 +106,17 @@ def task1_dijkstra():
 
 # ── Task 2 : UCS with energy constraint ──────────────────────
 def task2_ucs():
-    parent     = {SOURCE: (None, 0.0, 0.0)}
-    vis_energy = {}
-    heap       = [(0.0, SOURCE, 0.0)]
-    expanded   = 0
+    # Standard Dijkstra on distance with energy as a hard budget prune.
+    # A node is settled on its FIRST pop (minimum distance guaranteed by heap).
+    # Energy is only used to filter out neighbours that would exceed the budget.
+    parent   = {SOURCE: (None, 0.0, 0.0)}
+    visited  = set()
+    heap     = [(0.0, SOURCE, 0.0)]   # (dist, node, energy)
+    expanded = 0
     while heap:
         dist, node, energy = heapq.heappop(heap)
-        if node in vis_energy and vis_energy[node] <= energy: continue
-        vis_energy[node] = energy; expanded += 1
+        if node in visited: continue          # already settled at min-distance
+        visited.add(node); expanded += 1
         if node == TARGET: break
         pd, pe = parent[node][1], parent[node][2]
         for nb in G.get(node, []):
@@ -122,9 +124,10 @@ def task2_ucs():
             if edge not in Dist: continue
             nd = pd + Dist[edge]
             ne = pe + Cost.get(edge, 0.0)
-            if ne > ENERGY_BUDGET: continue
-            if nb not in vis_energy or vis_energy[nb] > ne:
-                parent[nb] = (node, nd, ne)
+            if ne > ENERGY_BUDGET: continue   # hard budget prune
+            if nb not in visited:
+                if nb not in parent or parent[nb][1] > nd:
+                    parent[nb] = (node, nd, ne)
                 heapq.heappush(heap, (nd, nb, ne))
     return _reconstruct(parent), parent[TARGET][1], parent[TARGET][2], expanded
 
@@ -135,16 +138,17 @@ def _h(node):
     return math.hypot(x1-x2, y1-y2)
 
 def task3_astar():
+    # A* on distance with f(n) = g(n) + h(n), h = Euclidean distance (admissible).
+    # Standard visited set: a node is settled on first pop (min-distance guaranteed).
+    # Energy is only used as a hard budget prune when pushing neighbours.
     parent   = {SOURCE: (None, 0.0, 0.0)}
-    visited  = {}
-    heap     = [(_h(SOURCE), 0.0, SOURCE, 0.0)]
+    visited  = set()
+    heap     = [(_h(SOURCE), 0.0, SOURCE, 0.0)]   # (f, g, node, energy)
     expanded = 0
     while heap:
         f, g, node, energy = heapq.heappop(heap)
-        if node in visited:
-            pg, pe = visited[node]
-            if pg <= g and pe <= energy: continue
-        visited[node] = (g, energy); expanded += 1
+        if node in visited: continue              # already settled at min-distance
+        visited.add(node); expanded += 1
         if node == TARGET: break
         pg, pe = parent[node][1], parent[node][2]
         for nb in G.get(node, []):
@@ -152,12 +156,11 @@ def task3_astar():
             if edge not in Dist: continue
             ng = pg + Dist[edge]
             ne = pe + Cost.get(edge, 0.0)
-            if ne > ENERGY_BUDGET: continue
-            if nb in visited:
-                vg, ve = visited[nb]
-                if vg <= ng and ve <= ne: continue
-            parent[nb] = (node, ng, ne)
-            heapq.heappush(heap, (ng+_h(nb), ng, nb, ne))
+            if ne > ENERGY_BUDGET: continue       # hard budget prune
+            if nb not in visited:
+                if nb not in parent or parent[nb][1] > ng:
+                    parent[nb] = (node, ng, ne)
+                heapq.heappush(heap, (ng + _h(nb), ng, nb, ne))
     return _reconstruct(parent), parent[TARGET][1], parent[TARGET][2], expanded
 
 
